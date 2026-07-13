@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no, interactive-widget=resizes-content">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -13,12 +13,14 @@
 <title>Mis Entrenos</title>
 <style>
 :root{--bg:#131110;--panel:#1B1815;--panel2:#26211A;--line:#2E2921;--ink:#F4EFE6;--mut:#9C937F;
- --acc:#E8A33D;--accink:#221703;--green:#7FBF8E;--warn:#E8794A}
+ --acc:#E8A33D;--accink:#221703;--green:#7FBF8E;--warn:#E8794A;
+ --safetop:env(safe-area-inset-top);--safebot:env(safe-area-inset-bottom)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
- font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:16px}
-body{padding:env(safe-area-inset-top) 0 0}
-#app{max-width:520px;margin:0 auto;padding:18px 16px 116px;min-height:100vh}
+html,body{margin:0;padding:0;height:100%;overflow:hidden;position:fixed;width:100%;
+ background:var(--bg);color:var(--ink);font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:16px;
+ overscroll-behavior:none}
+#app{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
+ padding:calc(var(--safetop) + 18px) 16px calc(var(--safebot) + 116px);max-width:520px;margin:0 auto;width:100%;left:50%;transform:translateX(-50%)}
 h1{font-size:24px;font-weight:750;letter-spacing:-.3px;margin:0}
 h1 em{color:var(--acc);font-style:normal}
 .sub{color:var(--mut);font-size:13.5px;margin:3px 0 18px}
@@ -34,23 +36,45 @@ h1 em{color:var(--acc);font-style:normal}
 .badge{font-size:12px;font-weight:650;padding:5px 11px;border-radius:20px;white-space:nowrap}
 .badge.done{background:rgba(127,191,142,.14);color:var(--green)}
 .badge.todo{background:var(--panel2);color:var(--mut)}
-.counter{font-size:36px;font-weight:800;letter-spacing:-1px}
-.counter small{font-size:16px;color:var(--mut);font-weight:600}
-.weekline{display:flex;justify-content:space-between;padding:10px 2px;border-bottom:1px solid var(--line);font-size:14px}
+.gear{background:var(--panel);border:1px solid var(--line);color:var(--mut);border-radius:12px;
+ width:42px;height:42px;font-size:19px;cursor:pointer}
+/* calendario */
+.cal{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px}
+.calhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.calhead b{font-size:15.5px;font-weight:700;text-transform:capitalize}
+.calnav{background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:9px;
+ width:34px;height:34px;font-size:15px;cursor:pointer}
+.calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.caldow{font-size:10.5px;color:var(--mut);font-weight:650;text-transform:uppercase;padding:4px 0}
+.cald{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:10px;
+ font-size:13.5px;color:var(--ink);position:relative}
+.cald.off{color:var(--line)}
+.cald.hoy{outline:1.5px solid var(--acc);outline-offset:-1.5px;font-weight:750}
+.cald.gym{background:var(--acc);color:var(--accink);font-weight:750}
+.stats2{display:flex;gap:12px;margin-bottom:12px}
+.stats2 .card{flex:1;margin:0;text-align:center;padding:13px 8px}
+.stats2 b{font-size:24px;font-weight:800;display:block;letter-spacing:-.5px}
+.stats2 span{font-size:12px;color:var(--mut)}
+.bigbtn{display:block;width:100%;background:var(--acc);color:var(--accink);border:none;border-radius:14px;
+ padding:15px;font-size:16px;font-weight:750;cursor:pointer;font-family:inherit;margin-bottom:12px}
+.weekline{display:flex;justify-content:space-between;align-items:center;padding:10px 2px;border-bottom:1px solid var(--line);font-size:14px}
 .weekline:last-child{border-bottom:none}
 .weekline .n{color:var(--mut)}
 .tabbar{position:fixed;bottom:0;left:0;right:0;background:rgba(27,24,21,.96);backdrop-filter:blur(14px);
  -webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);display:flex;max-width:520px;margin:0 auto;
- padding-bottom:env(safe-area-inset-bottom)}
+ padding-bottom:var(--safebot);z-index:9}
 .tab{flex:1;padding:12px 0 10px;text-align:center;background:none;border:none;color:var(--mut);
- font-size:11px;font-weight:650;letter-spacing:.3px;cursor:pointer;font-family:inherit;position:relative}
+ font-size:11px;font-weight:650;letter-spacing:.2px;cursor:pointer;font-family:inherit;position:relative}
 .tab.on{color:var(--acc)}
 .tab.on::before{content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);width:22px;height:3px;
  border-radius:0 0 4px 4px;background:var(--acc)}
-.back{background:none;border:none;color:var(--mut);font-size:14px;padding:0;margin-bottom:12px;cursor:pointer;font-family:inherit}
+.back{background:var(--panel);border:1px solid var(--line);color:var(--ink);font-size:14px;font-weight:650;
+ padding:9px 14px;border-radius:11px;margin-bottom:14px;cursor:pointer;font-family:inherit}
+.swipehint{color:var(--mut);font-size:11.5px;margin:-8px 0 12px}
 .ex{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px}
 .extop{display:flex;gap:11px;align-items:flex-start}
-.exim{width:62px;height:62px;object-fit:cover;border-radius:12px;border:1px solid var(--line);background:#fff;flex:none;cursor:pointer}
+.exim{width:62px;height:62px;object-fit:cover;border-radius:12px;border:1px solid var(--line);background:#fff;flex:none;
+ cursor:pointer;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;touch-action:manipulation}
 .excontent{flex:1;min-width:0}
 .exhead{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 .exhead h4{margin:0;font-size:15px;font-weight:650;letter-spacing:-.1px}
@@ -70,19 +94,21 @@ input.f.done{border-color:rgba(127,191,142,.6)}
  margin-top:10px;cursor:pointer;font-family:inherit;font-size:13px}
 .addex{background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:14px;width:100%;padding:14px;
  cursor:pointer;font-family:inherit;font-size:14.5px;font-weight:650;margin-bottom:12px}
-.savebtn{position:fixed;bottom:calc(58px + env(safe-area-inset-bottom));left:16px;right:16px;max-width:488px;margin:0 auto;
+.savebtn{position:fixed;bottom:calc(58px + var(--safebot));left:16px;right:16px;max-width:488px;margin:0 auto;
  background:var(--acc);color:var(--accink);border:none;border-radius:14px;padding:15px;font-size:16.5px;font-weight:750;
  letter-spacing:.2px;cursor:pointer;box-shadow:0 6px 24px rgba(232,163,61,.3);font-family:inherit;z-index:8}
-.timer{position:sticky;top:8px;z-index:5;background:rgba(38,33,26,.96);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
- border:1px solid var(--line);border-radius:14px;padding:10px;margin-bottom:14px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
-.disp{font-size:23px;font-weight:750;min-width:72px;text-align:center;font-variant-numeric:tabular-nums}
-.disp.run{color:var(--acc)}
-.tbtn{background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:8px 11px;
- font-size:13px;font-weight:650;cursor:pointer;font-family:inherit}
-.tbtn.stop{color:var(--warn);border-color:rgba(232,121,74,.5)}
+/* cronómetro de sesión */
+.crono{position:sticky;top:calc(var(--safetop) + 4px);z-index:5;background:rgba(38,33,26,.97);backdrop-filter:blur(10px);
+ -webkit-backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:14px;padding:11px 13px;margin-bottom:14px;
+ display:flex;align-items:center;gap:10px}
+.crono .t{font-size:26px;font-weight:800;font-variant-numeric:tabular-nums;flex:1;letter-spacing:-.5px}
+.crono .t.pausa{color:var(--mut)}
+.cbtn{background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:11px;
+ width:44px;height:40px;font-size:16px;cursor:pointer}
+.cbtn.warn{color:var(--warn);border-color:rgba(232,121,74,.4)}
 .hcard .top{display:flex;justify-content:space-between;align-items:center;cursor:pointer}
 .hcard h4{margin:0;font-size:16px;font-weight:700}
-.fecha{color:var(--mut);font-size:13px}
+.fecha{color:var(--mut);font-size:13px;text-align:right}
 .hdet{margin-top:11px;border-top:1px solid var(--line);padding-top:11px;font-size:13px}
 .hdet .ln{display:flex;justify-content:space-between;padding:3px 0;gap:12px}
 .hdet .ln span:last-child{color:var(--mut);text-align:right}
@@ -94,23 +120,29 @@ select.f{margin-bottom:12px}
 .stat{display:flex;gap:20px;margin-bottom:8px}
 .stat div b{font-size:20px;display:block;font-weight:750}
 .stat div span{font-size:12px;color:var(--mut)}
-.toast{position:fixed;top:calc(14px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);
+.toast{position:fixed;top:calc(14px + var(--safetop));left:50%;transform:translateX(-50%);
  background:var(--green);color:#0e1a12;padding:11px 20px;border-radius:12px;font-weight:650;font-size:14px;z-index:99;
  box-shadow:0 6px 20px rgba(0,0,0,.4)}
 .toast.warn{background:var(--warn);color:#2a1108}
 label.lbl{display:block;font-size:12px;color:var(--mut);margin:0 0 8px;font-weight:650;text-transform:uppercase;letter-spacing:.7px}
-.picker{position:fixed;inset:0;background:rgba(19,17,16,.97);z-index:50;overflow-y:auto;padding:16px 16px 40px;max-width:520px;margin:0 auto}
+.overlay{position:fixed;inset:0;background:rgba(19,17,16,.98);z-index:50;overflow-y:auto;-webkit-overflow-scrolling:touch;
+ padding:calc(var(--safetop) + 14px) 16px calc(var(--safebot) + 40px);max-width:520px;margin:0 auto;width:100%;left:50%;transform:translateX(-50%)}
 .pickitem{display:flex;gap:10px;align-items:center;padding:10px;cursor:pointer}
-.libitem{display:flex;gap:11px;align-items:center;padding:11px}
+.libitem{display:flex;gap:11px;align-items:center;padding:11px;cursor:pointer}
 .libitem .exim,.pickitem .exim{width:54px;height:54px}
 .groupchip{display:inline-block;background:var(--panel2);color:var(--mut);border-radius:20px;padding:3px 9px;font-size:11px;margin-top:2px}
+.detimgs{display:flex;gap:10px;margin:14px 0}
+.detimgs figure{flex:1;margin:0}
+.detimgs img{width:100%;border-radius:14px;border:1px solid var(--line);background:#fff;display:block}
+.detimgs figcaption{text-align:center;color:var(--mut);font-size:12px;margin-top:6px;font-weight:650}
+.detdesc{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:15px;font-size:14.5px;line-height:1.55;color:var(--ink)}
 </style>
 </head>
 <body>
 <div id="app"></div>
 <nav class="tabbar" id="tabbar"></nav>
 <script>
-/* ================= RUTINA (máquinas, adaptada) ================= */
+/* ================= RUTINA ================= */
 const RUTINA=[
  {id:"empuje",nombre:"Torso Empuje",sub:"Pecho, hombro, tríceps + cinta",ejercicios:[
   {id:"e1",img:"machine-bench-press",nombre:"Press pecho en máquina",series:4,reps:"10-12"},
@@ -147,11 +179,11 @@ const RUTINA=[
   {id:"f6",img:"walking-treadmill",nombre:"Cinta: caminar (el día largo)",series:1,cardio:true,cinta:true}]}
 ];
 const ALLEX=RUTINA.flatMap(d=>d.ejercicios.map(e=>({...e,dia:d.nombre})));
-const CATALOGO=[{"s":"barbell-bench-press-medium-grip","n":"Press banca con barra","g":"Pecho"},{"s":"dumbbell-bench-press","n":"Press banca mancuernas","g":"Pecho"},{"s":"dumbbell-bench-press-with-neutral-grip","n":"Press banca mancuernas agarre neutro","g":"Pecho"},{"s":"incline-dumbbell-press","n":"Press inclinado mancuernas","g":"Pecho"},{"s":"barbell-incline-bench-press-medium-grip","n":"Press inclinado con barra","g":"Pecho"},{"s":"decline-dumbbell-bench-press","n":"Press declinado mancuernas","g":"Pecho"},{"s":"machine-bench-press","n":"Press pecho en máquina","g":"Pecho"},{"s":"leverage-chest-press","n":"Press pecho máquina palanca","g":"Pecho"},{"s":"leverage-incline-chest-press","n":"Press inclinado máquina palanca","g":"Pecho"},{"s":"cable-crossover","n":"Cruces en polea","g":"Pecho"},{"s":"dumbbell-flyes","n":"Aperturas con mancuernas","g":"Pecho"},{"s":"incline-dumbbell-flyes","n":"Aperturas inclinadas mancuernas","g":"Pecho"},{"s":"butterfly","n":"Pec deck (contractora)","g":"Pecho"},{"s":"pushups","n":"Flexiones","g":"Pecho"},{"s":"wide-grip-lat-pulldown","n":"Jalón al pecho agarre ancho","g":"Espalda"},{"s":"close-grip-front-lat-pulldown","n":"Jalón al pecho agarre cerrado","g":"Espalda"},{"s":"v-bar-pulldown","n":"Jalón con barra V","g":"Espalda"},{"s":"straight-arm-pulldown","n":"Pullover en polea brazos rectos","g":"Espalda"},{"s":"seated-cable-rows","n":"Remo en polea baja","g":"Espalda"},{"s":"bent-over-barbell-row","n":"Remo con barra","g":"Espalda"},{"s":"one-arm-dumbbell-row","n":"Remo mancuerna a una mano","g":"Espalda"},{"s":"leverage-high-row","n":"Remo alto en máquina","g":"Espalda"},{"s":"leverage-iso-row","n":"Remo en máquina (apoyo pecho)","g":"Espalda"},{"s":"t-bar-row-with-handle","n":"Remo en T","g":"Espalda"},{"s":"pullups","n":"Dominadas","g":"Espalda"},{"s":"chin-up","n":"Dominadas supinas","g":"Espalda"},{"s":"inverted-row","n":"Remo invertido","g":"Espalda"},{"s":"bent-over-two-dumbbell-row","n":"Remo con dos mancuernas","g":"Espalda"},{"s":"hyperextensions-back-extensions","n":"Hiperextensiones lumbares","g":"Espalda"},{"s":"face-pull","n":"Face pull","g":"Espalda"},{"s":"seated-dumbbell-press","n":"Press militar sentado mancuernas","g":"Hombros"},{"s":"dumbbell-shoulder-press","n":"Press de hombros mancuernas","g":"Hombros"},{"s":"barbell-shoulder-press","n":"Press militar con barra","g":"Hombros"},{"s":"arnold-dumbbell-press","n":"Press Arnold","g":"Hombros"},{"s":"leverage-shoulder-press","n":"Press hombros en máquina","g":"Hombros"},{"s":"side-lateral-raise","n":"Elevaciones laterales","g":"Hombros"},{"s":"front-dumbbell-raise","n":"Elevaciones frontales","g":"Hombros"},{"s":"seated-bent-over-rear-delt-raise","n":"Pájaros sentado (deltoide posterior)","g":"Hombros"},{"s":"reverse-machine-flyes","n":"Aperturas invertidas en máquina","g":"Hombros"},{"s":"cable-rear-delt-fly","n":"Aperturas posteriores en polea","g":"Hombros"},{"s":"standing-dumbbell-upright-row","n":"Remo al mentón mancuernas","g":"Hombros"},{"s":"dumbbell-bicep-curl","n":"Curl bíceps mancuernas","g":"Bíceps"},{"s":"dumbbell-alternate-bicep-curl","n":"Curl alterno mancuernas","g":"Bíceps"},{"s":"barbell-curl","n":"Curl con barra","g":"Bíceps"},{"s":"ez-bar-curl","n":"Curl con barra Z","g":"Bíceps"},{"s":"hammer-curls","n":"Curl martillo","g":"Bíceps"},{"s":"preacher-curl","n":"Curl predicador (banco Scott)","g":"Bíceps"},{"s":"concentration-curls","n":"Curl concentrado","g":"Bíceps"},{"s":"incline-dumbbell-curl","n":"Curl inclinado mancuernas","g":"Bíceps"},{"s":"standing-biceps-cable-curl","n":"Curl en polea","g":"Bíceps"},{"s":"triceps-pushdown","n":"Tríceps en polea (barra)","g":"Tríceps"},{"s":"triceps-pushdown-rope-attachment","n":"Tríceps en polea (cuerda)","g":"Tríceps"},{"s":"ez-bar-skullcrusher","n":"Press francés barra Z","g":"Tríceps"},{"s":"lying-triceps-press","n":"Press francés tumbado","g":"Tríceps"},{"s":"standing-dumbbell-triceps-extension","n":"Extensión tríceps mancuerna sobre cabeza","g":"Tríceps"},{"s":"cable-rope-overhead-triceps-extension","n":"Extensión tríceps polea sobre cabeza","g":"Tríceps"},{"s":"dips-triceps-version","n":"Fondos en paralelas (tríceps)","g":"Tríceps"},{"s":"machine-triceps-extension","n":"Extensión tríceps en máquina","g":"Tríceps"},{"s":"bench-dips","n":"Fondos en banco","g":"Tríceps"},{"s":"barbell-shrug","n":"Encogimientos con barra","g":"Trapecios"},{"s":"dumbbell-shrug","n":"Encogimientos con mancuernas","g":"Trapecios"},{"s":"leg-press","n":"Prensa de piernas","g":"Cuádriceps"},{"s":"narrow-stance-leg-press","n":"Prensa postura estrecha","g":"Cuádriceps"},{"s":"barbell-squat","n":"Sentadilla con barra","g":"Cuádriceps"},{"s":"front-barbell-squat","n":"Sentadilla frontal","g":"Cuádriceps"},{"s":"goblet-squat","n":"Sentadilla goblet","g":"Cuádriceps"},{"s":"dumbbell-squat","n":"Sentadilla con mancuernas","g":"Cuádriceps"},{"s":"bodyweight-squat","n":"Sentadilla peso corporal","g":"Cuádriceps"},{"s":"smith-machine-squat","n":"Sentadilla en multipower","g":"Cuádriceps"},{"s":"hack-squat","n":"Sentadilla hack","g":"Cuádriceps"},{"s":"leg-extensions","n":"Extensión de cuádriceps","g":"Cuádriceps"},{"s":"barbell-lunge","n":"Zancadas con barra","g":"Cuádriceps"},{"s":"dumbbell-lunges","n":"Zancadas con mancuernas","g":"Cuádriceps"},{"s":"dumbbell-rear-lunge","n":"Zancada hacia atrás mancuernas","g":"Cuádriceps"},{"s":"bodyweight-walking-lunge","n":"Zancadas caminando","g":"Cuádriceps"},{"s":"dumbbell-step-ups","n":"Subidas a cajón con mancuernas","g":"Cuádriceps"},{"s":"split-squat-with-dumbbells","n":"Sentadilla búlgara mancuernas","g":"Cuádriceps"},{"s":"romanian-deadlift","n":"Peso muerto rumano","g":"Femoral y glúteo"},{"s":"stiff-legged-barbell-deadlift","n":"Peso muerto piernas rígidas","g":"Femoral y glúteo"},{"s":"barbell-deadlift","n":"Peso muerto convencional","g":"Femoral y glúteo"},{"s":"lying-leg-curls","n":"Curl femoral tumbado","g":"Femoral y glúteo"},{"s":"seated-leg-curl","n":"Curl femoral sentado","g":"Femoral y glúteo"},{"s":"standing-leg-curl","n":"Curl femoral de pie","g":"Femoral y glúteo"},{"s":"ball-leg-curl","n":"Curl femoral con fitball","g":"Femoral y glúteo"},{"s":"barbell-hip-thrust","n":"Hip thrust con barra","g":"Femoral y glúteo"},{"s":"barbell-glute-bridge","n":"Puente de glúteo con barra","g":"Femoral y glúteo"},{"s":"butt-lift-bridge","n":"Puente de glúteo","g":"Femoral y glúteo"},{"s":"glute-kickback","n":"Patada de glúteo","g":"Femoral y glúteo"},{"s":"thigh-abductor","n":"Abducción de cadera en máquina","g":"Femoral y glúteo"},{"s":"thigh-adductor","n":"Aducción de cadera en máquina","g":"Femoral y glúteo"},{"s":"good-morning","n":"Buenos días con barra","g":"Femoral y glúteo"},{"s":"one-arm-kettlebell-swings","n":"Swing con kettlebell a una mano","g":"Femoral y glúteo"},{"s":"standing-calf-raises","n":"Gemelos de pie","g":"Gemelos"},{"s":"barbell-seated-calf-raise","n":"Gemelos sentado con barra","g":"Gemelos"},{"s":"calf-press-on-the-leg-press-machine","n":"Gemelos en prensa","g":"Gemelos"},{"s":"rocking-standing-calf-raise","n":"Gemelos de pie con barra","g":"Gemelos"},{"s":"dumbbell-seated-one-leg-calf-raise","n":"Gemelo sentado una pierna mancuerna","g":"Gemelos"},{"s":"plank","n":"Plancha","g":"Core"},{"s":"side-bridge","n":"Plancha lateral","g":"Core"},{"s":"crunches","n":"Crunch abdominal","g":"Core"},{"s":"cable-crunch","n":"Crunch en polea","g":"Core"},{"s":"ab-crunch-machine","n":"Crunch en máquina","g":"Core"},{"s":"3-4-sit-up","n":"Sit-up 3/4","g":"Core"},{"s":"cross-body-crunch","n":"Crunch cruzado","g":"Core"},{"s":"russian-twist","n":"Giro ruso","g":"Core"},{"s":"plate-twist","n":"Giro ruso con disco","g":"Core"},{"s":"pallof-press","n":"Pallof press","g":"Core"},{"s":"pallof-press-with-rotation","n":"Pallof press con rotación","g":"Core"},{"s":"standing-cable-wood-chop","n":"Leñador en polea","g":"Core"},{"s":"hanging-leg-raise","n":"Elevación de piernas colgado","g":"Core"},{"s":"flat-bench-lying-leg-raise","n":"Elevación de piernas en banco","g":"Core"},{"s":"mountain-climbers","n":"Escaladores","g":"Core"},{"s":"rope-jumping","n":"Salto a la cuerda","g":"Cardio"},{"s":"fast-skipping","n":"Skipping rápido","g":"Cardio"},{"s":"bicycling-stationary","n":"Bicicleta estática","g":"Cardio"},{"s":"recumbent-bike","n":"Bicicleta reclinada","g":"Cardio"},{"s":"air-bike","n":"Bicicleta de aire (assault)","g":"Cardio"},{"s":"elliptical-trainer","n":"Elíptica","g":"Cardio"},{"s":"rowing-stationary","n":"Remo (máquina de remar)","g":"Cardio"},{"s":"walking-treadmill","n":"Caminar en cinta","g":"Cardio"},{"s":"jogging-treadmill","n":"Trote en cinta","g":"Cardio"},{"s":"stairmaster","n":"Escaladora (stairmaster)","g":"Cardio"}];
+const CATALOGO=[{"s":"barbell-bench-press-medium-grip","n":"Press banca con barra","g":"Pecho","d":"Tumbado en banco, baja la barra al pecho con control y empuja soltando el aire. Pies firmes en el suelo y escápulas juntas; no rebotes la barra en el pecho."},{"s":"dumbbell-bench-press","n":"Press banca mancuernas","g":"Pecho","d":"Como el press de banca pero con mancuernas: más recorrido y más amable con el hombro. Bájalas hasta la altura del pecho y empuja juntándolas arriba sin chocarlas."},{"s":"dumbbell-bench-press-with-neutral-grip","n":"Press banca mancuernas agarre neutro","g":"Pecho","d":"Press con las palmas enfrentadas: la variante más cómoda para el hombro. Ideal si el press normal molesta."},{"s":"incline-dumbbell-press","n":"Press inclinado mancuernas","g":"Pecho","d":"En banco inclinado (30-45°), trabaja la parte alta del pecho. Baja las mancuernas a los lados del pecho y empuja hacia arriba, no hacia la cara."},{"s":"barbell-incline-bench-press-medium-grip","n":"Press inclinado con barra","g":"Pecho","d":"Press con barra en banco inclinado para pecho superior. Baja a la parte alta del pecho con control."},{"s":"decline-dumbbell-bench-press","n":"Press declinado mancuernas","g":"Pecho","d":"Press en banco declinado, énfasis en pecho inferior. Menos habitual; el plano llano ya lo cubre casi todo."},{"s":"machine-bench-press","n":"Press pecho en máquina","g":"Pecho","d":"Press de pecho guiado por máquina: perfecto para aprender el patrón con seguridad. Ajusta el asiento para que las agarraderas queden a la altura del pecho y empuja soltando el aire."},{"s":"leverage-chest-press","n":"Press pecho máquina palanca","g":"Pecho","d":"Press de pecho en máquina de palanca con discos. Espalda pegada al respaldo y empuje controlado; no bloquees los codos de golpe."},{"s":"leverage-incline-chest-press","n":"Press inclinado máquina palanca","g":"Pecho","d":"Press inclinado en máquina: pecho superior con total estabilidad. Buena alternativa al banco inclinado libre."},{"s":"cable-crossover","n":"Cruces en polea","g":"Pecho","d":"De pie entre dos poleas altas, junta las manos delante del pecho con brazos casi rectos, como abrazando un barril. Movimiento de aislamiento, peso moderado."},{"s":"dumbbell-flyes","n":"Aperturas con mancuernas","g":"Pecho","d":"Tumbado, abre los brazos con ligera flexión de codo y ciérralos como un abrazo. Baja solo hasta notar estiramiento suave, no fuerces el hombro."},{"s":"incline-dumbbell-flyes","n":"Aperturas inclinadas mancuernas","g":"Pecho","d":"Aperturas en banco inclinado para el pecho superior. Codos ligeramente flexionados fijos durante todo el recorrido."},{"s":"butterfly","n":"Pec deck (contractora)","g":"Pecho","d":"Máquina contractora: junta los brazos delante del pecho apretando 1 segundo al cierre. Aislamiento seguro del pectoral, ideal para acabar."},{"s":"pushups","n":"Flexiones","g":"Pecho","d":"Flexiones en el suelo: cuerpo recto como una tabla, baja el pecho y empuja. Si pesan mucho, hazlas con las manos apoyadas en un banco (más fácil cuanto más alto)."},{"s":"wide-grip-lat-pulldown","n":"Jalón al pecho agarre ancho","g":"Espalda","d":"Sentado, tira de la barra hacia la parte alta del pecho con agarre ancho, llevando los codos abajo y atrás. Pecho fuera y sin balancearte."},{"s":"close-grip-front-lat-pulldown","n":"Jalón al pecho agarre cerrado","g":"Espalda","d":"Jalón con agarre estrecho: más recorrido y participación de bíceps. Tira hacia el pecho, no hacia el cuello."},{"s":"v-bar-pulldown","n":"Jalón con barra V","g":"Espalda","d":"Jalón con maneral en V (palmas enfrentadas), muy cómodo para hombro y codo. Saca pecho al tirar."},{"s":"straight-arm-pulldown","n":"Pullover en polea brazos rectos","g":"Espalda","d":"De pie frente a la polea alta, baja la barra hasta las caderas con los brazos casi rectos. Aísla el dorsal sin cargar el bíceps."},{"s":"seated-cable-rows","n":"Remo en polea baja","g":"Espalda","d":"Sentado, tira del maneral hacia el abdomen llevando los hombros atrás. Espalda recta: el movimiento sale de los codos, no de balancear el tronco."},{"s":"bent-over-barbell-row","n":"Remo con barra","g":"Espalda","d":"Remo con barra inclinando el tronco. Exigente para la zona lumbar: si estás empezando, prefiere las versiones en máquina o con apoyo."},{"s":"one-arm-dumbbell-row","n":"Remo mancuerna a una mano","g":"Espalda","d":"Con rodilla y mano apoyadas en un banco, tira de la mancuerna hacia la cadera. El apoyo protege la lumbar; no gires el tronco al subir."},{"s":"leverage-high-row","n":"Remo alto en máquina","g":"Espalda","d":"Remo alto en máquina de palanca: tira de arriba hacia ti, mezcla de jalón y remo. Pecho apoyado si la máquina lo permite."},{"s":"leverage-iso-row","n":"Remo en máquina (apoyo pecho)","g":"Espalda","d":"Remo en máquina con el pecho apoyado en el respaldo: la opción más segura para la espalda baja. Tira de los codos hacia atrás juntando las escápulas."},{"s":"t-bar-row-with-handle","n":"Remo en T","g":"Espalda","d":"Remo en T a caballo de la barra. Potente para toda la espalda; mantén la lumbar neutra en todo momento."},{"s":"pullups","n":"Dominadas","g":"Espalda","d":"Dominadas: colgado de la barra, sube hasta pasar la barbilla. Con tu peso actual, usa la máquina asistida o gomas; llegarán con el tiempo."},{"s":"chin-up","n":"Dominadas supinas","g":"Espalda","d":"Dominada con palmas hacia ti: más bíceps y algo más fácil que la dominada normal. También en máquina asistida al principio."},{"s":"inverted-row","n":"Remo invertido","g":"Espalda","d":"Remo colgado de una barra baja con los pies en el suelo, cuerpo recto. Cuanto más vertical estés, más fácil."},{"s":"bent-over-two-dumbbell-row","n":"Remo con dos mancuernas","g":"Espalda","d":"Remo con dos mancuernas inclinando el tronco. Versión sin banco del remo a una mano; exige lumbar fuerte."},{"s":"hyperextensions-back-extensions","n":"Hiperextensiones lumbares","g":"Espalda","d":"En el banco romano, baja el tronco y sube hasta la línea recta apretando glúteo. No hiperextiendas arriba; fortalece la espalda baja con suavidad."},{"s":"face-pull","n":"Face pull","g":"Espalda","d":"Tira de la cuerda de la polea hacia la cara, separando las manos y llevando los codos altos y atrás. Oro para la salud del hombro; peso ligero y muchas reps."},{"s":"seated-dumbbell-press","n":"Press militar sentado mancuernas","g":"Hombros","d":"Sentado con respaldo, empuja las mancuernas desde los hombros hasta arriba. El respaldo protege la lumbar; baja hasta la altura de las orejas."},{"s":"dumbbell-shoulder-press","n":"Press de hombros mancuernas","g":"Hombros","d":"Press de hombros con mancuernas de pie o sentado. Abdomen firme y sin arquear la espalda al empujar."},{"s":"barbell-shoulder-press","n":"Press militar con barra","g":"Hombros","d":"Press militar con barra. Exige buena movilidad de hombro; si molesta, usa mancuernas o máquina."},{"s":"arnold-dumbbell-press","n":"Press Arnold","g":"Hombros","d":"Press girando las palmas durante la subida (empiezan mirándote y acaban al frente). Recorrido largo y fluido, peso moderado."},{"s":"leverage-shoulder-press","n":"Press hombros en máquina","g":"Hombros","d":"Press de hombros en máquina: trayectoria guiada y espalda apoyada, la opción más segura para empezar. Empuja sin bloquear los codos de golpe."},{"s":"side-lateral-raise","n":"Elevaciones laterales","g":"Hombros","d":"De pie, eleva las mancuernas a los lados hasta la altura de los hombros, codos ligeramente flexionados. Peso ligero, sin balanceo y sin pasar de la horizontal."},{"s":"front-dumbbell-raise","n":"Elevaciones frontales","g":"Hombros","d":"Eleva la mancuerna al frente hasta la altura del hombro, alternando brazos. Peso ligero; el hombro frontal ya trabaja mucho en los press."},{"s":"seated-bent-over-rear-delt-raise","n":"Pájaros sentado (deltoide posterior)","g":"Hombros","d":"Sentado e inclinado hacia delante, abre los brazos a los lados como alas. Trabaja el deltoides posterior, clave para la postura."},{"s":"reverse-machine-flyes","n":"Aperturas invertidas en máquina","g":"Hombros","d":"En la contractora invertida, abre los brazos hacia atrás. Deltoides posterior y espalda alta con total estabilidad."},{"s":"cable-rear-delt-fly","n":"Aperturas posteriores en polea","g":"Hombros","d":"Aperturas posteriores en polea, cruzando los cables. Movimiento fino: peso muy ligero y control."},{"s":"standing-dumbbell-upright-row","n":"Remo al mentón mancuernas","g":"Hombros","d":"Remo al mentón con mancuernas: sube los codos hacia arriba, no muy por encima de los hombros. Si notas pinzamiento, cámbialo por elevaciones laterales."},{"s":"dumbbell-bicep-curl","n":"Curl bíceps mancuernas","g":"Bíceps","d":"Curl clásico: sube las mancuernas girando las palmas hacia arriba, codos pegados al cuerpo. Baja despacio, sin balancear el tronco."},{"s":"dumbbell-alternate-bicep-curl","n":"Curl alterno mancuernas","g":"Bíceps","d":"Curl alternando un brazo y otro: permite concentrarte en cada repetición. Codo fijo al costado."},{"s":"barbell-curl","n":"Curl con barra","g":"Bíceps","d":"Curl con barra recta: permite más peso. Muñecas al frente; si molestan, usa la barra Z."},{"s":"ez-bar-curl","n":"Curl con barra Z","g":"Bíceps","d":"Curl con barra Z: el ángulo del agarre protege muñecas y codos. La mejor barra para el curl."},{"s":"hammer-curls","n":"Curl martillo","g":"Bíceps","d":"Curl con palmas enfrentadas (como martillos): trabaja bíceps y antebrazo. Muy amable con el codo."},{"s":"preacher-curl","n":"Curl predicador (banco Scott)","g":"Bíceps","d":"Curl en banco Scott, con los brazos apoyados en el cojín: imposible hacer trampa. Estira abajo con control, sin soltar el peso de golpe."},{"s":"concentration-curls","n":"Curl concentrado","g":"Bíceps","d":"Sentado, con el codo apoyado en el muslo interno, sube la mancuerna concentrándote en apretar el bíceps."},{"s":"incline-dumbbell-curl","n":"Curl inclinado mancuernas","g":"Bíceps","d":"Curl tumbado en banco inclinado: el bíceps trabaja desde estiramiento máximo. Peso moderado."},{"s":"standing-biceps-cable-curl","n":"Curl en polea","g":"Bíceps","d":"Curl en polea baja: tensión constante durante todo el recorrido. Codos fijos al costado."},{"s":"triceps-pushdown","n":"Tríceps en polea (barra)","g":"Tríceps","d":"En polea alta, empuja la barra hacia abajo hasta estirar los brazos, codos pegados al cuerpo. Solo se mueve el antebrazo."},{"s":"triceps-pushdown-rope-attachment","n":"Tríceps en polea (cuerda)","g":"Tríceps","d":"Igual que el pushdown pero con cuerda: al final separa las manos hacia fuera para apretar más. Muy cómodo para el codo."},{"s":"ez-bar-skullcrusher","n":"Press francés barra Z","g":"Tríceps","d":"Tumbado, baja la barra Z hacia la frente flexionando solo los codos y estira. Peso moderado y control total."},{"s":"lying-triceps-press","n":"Press francés tumbado","g":"Tríceps","d":"Press francés tumbado: baja la barra por detrás de la cabeza y estira los brazos. Codos apuntando al techo todo el rato."},{"s":"standing-dumbbell-triceps-extension","n":"Extensión tríceps mancuerna sobre cabeza","g":"Tríceps","d":"Con una mancuerna a dos manos por detrás de la cabeza, estira los brazos hacia arriba. Codos cerca de las orejas."},{"s":"cable-rope-overhead-triceps-extension","n":"Extensión tríceps polea sobre cabeza","g":"Tríceps","d":"Extensión sobre la cabeza con cuerda en polea: gran estiramiento del tríceps. Tronco estable, ligera inclinación adelante."},{"s":"dips-triceps-version","n":"Fondos en paralelas (tríceps)","g":"Tríceps","d":"Fondos en paralelas con el cuerpo vertical. Muy exigentes con tu peso actual: usa la máquina asistida o déjalos para más adelante."},{"s":"machine-triceps-extension","n":"Extensión tríceps en máquina","g":"Tríceps","d":"Extensión de tríceps en máquina: guiado y seguro. Perfecto si no hay polea disponible."},{"s":"bench-dips","n":"Fondos en banco","g":"Tríceps","d":"Fondos con las manos en un banco y los pies en el suelo. Baja solo hasta donde el hombro esté cómodo; cuanto más flexiones las rodillas, más fácil."},{"s":"barbell-shrug","n":"Encogimientos con barra","g":"Trapecios","d":"Con la barra colgando, encoge los hombros hacia las orejas y baja despacio. No gires los hombros en círculo, solo arriba y abajo."},{"s":"dumbbell-shrug","n":"Encogimientos con mancuernas","g":"Trapecios","d":"Encogimientos con mancuernas a los lados: más natural para los hombros que la barra. Sube, aprieta 1 segundo y baja."},{"s":"leg-press","n":"Prensa de piernas","g":"Cuádriceps","d":"Tu sentadilla segura: espalda pegada al respaldo, baja la plataforma con control hasta unos 90° y empuja con toda la planta. No despegues la cadera del asiento ni bloquees las rodillas arriba."},{"s":"narrow-stance-leg-press","n":"Prensa postura estrecha","g":"Cuádriceps","d":"Prensa con los pies juntos y bajos en la plataforma: más énfasis en el cuádriceps. Rango cómodo, sin forzar la rodilla."},{"s":"barbell-squat","n":"Sentadilla con barra","g":"Cuádriceps","d":"La sentadilla con barra es el rey de los ejercicios, pero exige técnica y movilidad. Para tu momento actual, la prensa la sustituye perfectamente; ya llegará."},{"s":"front-barbell-squat","n":"Sentadilla frontal","g":"Cuádriceps","d":"Sentadilla con la barra delante, sobre los hombros. Más vertical y técnica; para fases avanzadas."},{"s":"goblet-squat","n":"Sentadilla goblet","g":"Cuádriceps","d":"Sentadilla sujetando una mancuerna contra el pecho. La versión más fácil de aprender: siéntate hacia atrás como en una silla, pecho arriba."},{"s":"dumbbell-squat","n":"Sentadilla con mancuernas","g":"Cuádriceps","d":"Sentadilla con una mancuerna en cada mano. Sencilla de dosificar; baja hasta donde estés cómodo."},{"s":"bodyweight-squat","n":"Sentadilla peso corporal","g":"Cuádriceps","d":"Sentadilla sin peso: el patrón básico. Ideal para calentar; baja controlando y sube apretando glúteos."},{"s":"smith-machine-squat","n":"Sentadilla en multipower","g":"Cuádriceps","d":"Sentadilla en multipower (barra guiada): más estable que la libre. Pies ligeramente adelantados a la barra."},{"s":"hack-squat","n":"Sentadilla hack","g":"Cuádriceps","d":"Sentadilla en máquina hack, con la espalda apoyada en el respaldo inclinado. Buena progresión desde la prensa."},{"s":"leg-extensions","n":"Extensión de cuádriceps","g":"Cuádriceps","d":"Sentado, estira las rodillas contra el rodillo y baja con control. Peso ligero y aprieta arriba: fortalece el cuádriceps y protege la rodilla."},{"s":"barbell-lunge","n":"Zancadas con barra","g":"Cuádriceps","d":"Zancadas con barra a la espalda. Exigen equilibrio; empieza con mancuernas o sin peso."},{"s":"dumbbell-lunges","n":"Zancadas con mancuernas","g":"Cuádriceps","d":"Paso adelante y baja la rodilla trasera hacia el suelo, sube empujando con la pierna delantera. La rodilla delantera apunta al pie, no hacia dentro."},{"s":"dumbbell-rear-lunge","n":"Zancada hacia atrás mancuernas","g":"Cuádriceps","d":"Zancada dando el paso hacia atrás: más estable y amable con la rodilla que la zancada al frente."},{"s":"bodyweight-walking-lunge","n":"Zancadas caminando","g":"Cuádriceps","d":"Zancadas caminando sin peso. Buen ejercicio funcional cuando la rodilla esté fuerte."},{"s":"dumbbell-step-ups","n":"Subidas a cajón con mancuernas","g":"Cuádriceps","d":"Sube a un cajón o banco bajo con una pierna y baja con control. Empieza con un escalón bajo y sin peso; muy transferible al día a día."},{"s":"split-squat-with-dumbbells","n":"Sentadilla búlgara mancuernas","g":"Cuádriceps","d":"Sentadilla búlgara: pie trasero elevado en un banco. Intensa y avanzada; para cuando la rodilla y el equilibrio estén a punto."},{"s":"romanian-deadlift","n":"Peso muerto rumano","g":"Femoral y glúteo","d":"Con la barra o mancuernas pegadas a las piernas, empuja la cadera atrás bajando hasta media espinilla con la espalda recta. Notarás el estiramiento en los femorales; sube apretando glúteos."},{"s":"stiff-legged-barbell-deadlift","n":"Peso muerto piernas rígidas","g":"Femoral y glúteo","d":"Peso muerto con piernas casi rectas: más estiramiento femoral. Espalda neutra siempre; si se redondea, sube el punto de bajada."},{"s":"barbell-deadlift","n":"Peso muerto convencional","g":"Femoral y glúteo","d":"Peso muerto completo desde el suelo. Gran ejercicio pero técnico; el rumano es mejor punto de partida."},{"s":"lying-leg-curls","n":"Curl femoral tumbado","g":"Femoral y glúteo","d":"Tumbado boca abajo, flexiona las rodillas llevando el rodillo a los glúteos y baja despacio. Cadera pegada al banco."},{"s":"seated-leg-curl","n":"Curl femoral sentado","g":"Femoral y glúteo","d":"Curl femoral sentado: misma idea con la espalda apoyada. Muy cómodo y efectivo."},{"s":"standing-leg-curl","n":"Curl femoral de pie","g":"Femoral y glúteo","d":"Curl femoral de pie, una pierna cada vez. Útil si las otras máquinas están ocupadas."},{"s":"ball-leg-curl","n":"Curl femoral con fitball","g":"Femoral y glúteo","d":"Tumbado boca arriba con los talones sobre un fitball, eleva la cadera y flexiona las rodillas acercando la pelota. Femoral y glúteo sin máquinas."},{"s":"barbell-hip-thrust","n":"Hip thrust con barra","g":"Femoral y glúteo","d":"Con la espalda alta apoyada en un banco y la barra sobre la cadera, empuja hacia arriba apretando glúteos. Versión avanzada del puente; domina antes el puente en el suelo."},{"s":"barbell-glute-bridge","n":"Puente de glúteo con barra","g":"Femoral y glúteo","d":"Puente de glúteo en el suelo con barra sobre la cadera. Paso intermedio entre el puente sin peso y el hip thrust."},{"s":"butt-lift-bridge","n":"Puente de glúteo","g":"Femoral y glúteo","d":"Tumbado boca arriba con las rodillas flexionadas, eleva la cadera apretando los glúteos y aguanta 1 segundo arriba. Sencillo, seguro y muy efectivo: tu ejercicio de glúteo."},{"s":"glute-kickback","n":"Patada de glúteo","g":"Femoral y glúteo","d":"A cuatro patas, lleva el talón hacia el techo apretando el glúteo, sin arquear la lumbar."},{"s":"thigh-abductor","n":"Abducción de cadera en máquina","g":"Femoral y glúteo","d":"Sentado en la máquina, abre las piernas contra la resistencia. Fortalece el glúteo medio, que estabiliza cadera y rodilla al caminar."},{"s":"thigh-adductor","n":"Aducción de cadera en máquina","g":"Femoral y glúteo","d":"El movimiento contrario: cierra las piernas contra la resistencia. Trabaja los aductores del muslo interno."},{"s":"good-morning","n":"Buenos días con barra","g":"Femoral y glúteo","d":"Con la barra a la espalda, inclina el tronco empujando la cadera atrás. Muy técnico para la lumbar; el rumano es más seguro."},{"s":"one-arm-kettlebell-swings","n":"Swing con kettlebell a una mano","g":"Femoral y glúteo","d":"Balanceo de kettlebell con una mano: la cadera impulsa, no el brazo. Cardio y glúteo a la vez; requiere técnica, pídele una demo al monitor."},{"s":"standing-calf-raises","n":"Gemelos de pie","g":"Gemelos","d":"De pie en la máquina, ponte de puntillas todo lo alto que puedas y baja despacio dejando estirar el gemelo. Pausa arriba y abajo."},{"s":"barbell-seated-calf-raise","n":"Gemelos sentado con barra","g":"Gemelos","d":"Gemelo sentado con peso sobre las rodillas: trabaja el sóleo, la parte profunda. Reps lentas."},{"s":"calf-press-on-the-leg-press-machine","n":"Gemelos en prensa","g":"Gemelos","d":"En la prensa, apoya solo la punta de los pies en el borde de la plataforma y empuja con los tobillos. Cómodo y sin cargar la espalda."},{"s":"rocking-standing-calf-raise","n":"Gemelos de pie con barra","g":"Gemelos","d":"Gemelos de pie con barra, alternando puntillas y talones. Versión libre; requiere equilibrio."},{"s":"dumbbell-seated-one-leg-calf-raise","n":"Gemelo sentado una pierna mancuerna","g":"Gemelos","d":"Sentado, con una mancuerna sobre la rodilla, eleva el talón de una pierna. Aísla cada gemelo."},{"s":"plank","n":"Plancha","g":"Core","d":"Antebrazos y puntas de los pies en el suelo, cuerpo recto como una tabla: aprieta abdomen y glúteos, no dejes caer la cadera. Si es muy dura, apóyate con las rodillas."},{"s":"side-bridge","n":"Plancha lateral","g":"Core","d":"Plancha de lado sobre un antebrazo, cadera elevada y cuerpo alineado. Trabaja el core lateral; empieza con pocos segundos."},{"s":"crunches","n":"Crunch abdominal","g":"Core","d":"Tumbado con rodillas flexionadas, despega los omóplatos del suelo mirando al techo. Recorrido corto: no tires del cuello."},{"s":"cable-crunch","n":"Crunch en polea","g":"Core","d":"De rodillas frente a la polea alta con la cuerda tras la cabeza, encoge el tronco hacia abajo apretando el abdomen."},{"s":"ab-crunch-machine","n":"Crunch en máquina","g":"Core","d":"Crunch en máquina con resistencia regulable: la forma más cómoda de progresar en abdomen. Suelta el aire al encoger."},{"s":"3-4-sit-up","n":"Sit-up 3/4","g":"Core","d":"Incorporación parcial: sube tres cuartos del recorrido y baja con control. Más exigente que el crunch simple."},{"s":"cross-body-crunch","n":"Crunch cruzado","g":"Core","d":"Crunch llevando el codo hacia la rodilla contraria: añade rotación y trabaja los oblicuos."},{"s":"russian-twist","n":"Giro ruso","g":"Core","d":"Sentado con el tronco inclinado atrás, gira de lado a lado. Empieza con los pies apoyados en el suelo y sin peso."},{"s":"plate-twist","n":"Giro ruso con disco","g":"Core","d":"Giro ruso sujetando un disco: la versión con carga. Movimiento controlado, sin tirones."},{"s":"pallof-press","n":"Pallof press","g":"Core","d":"De pie, de lado a la polea, empuja el maneral al frente y resiste el giro que te pide el cable. El abdomen trabaja frenando: antirotación pura."},{"s":"pallof-press-with-rotation","n":"Pallof press con rotación","g":"Core","d":"Pallof añadiendo una rotación controlada al final. Versión avanzada del anterior."},{"s":"standing-cable-wood-chop","n":"Leñador en polea","g":"Core","d":"Leñador: lleva el maneral de arriba-fuera hacia abajo-dentro cruzando el cuerpo, girando desde el tronco. Peso moderado."},{"s":"hanging-leg-raise","n":"Elevación de piernas colgado","g":"Core","d":"Colgado de la barra, eleva las rodillas al pecho. Muy exigente; déjalo para más adelante o usa el respaldo de codos."},{"s":"flat-bench-lying-leg-raise","n":"Elevación de piernas en banco","g":"Core","d":"Tumbado en un banco, eleva las piernas rectas y bájalas sin arquear la lumbar. Flexiona las rodillas para hacerlo más fácil."},{"s":"mountain-climbers","n":"Escaladores","g":"Core","d":"En posición de plancha, lleva las rodillas al pecho alternando rápido. Cardio y core; con tu peso, ritmo moderado y muñecas fuertes."},{"s":"rope-jumping","n":"Salto a la cuerda","g":"Cardio","d":"Salto de boxeador: saltos rasos, casi sin despegar, rebotando en la punta de los pies con las muñecas girando la cuerda. Superficie que no sea hormigón y progresión lenta: es el cardio que más dispara pulsaciones."},{"s":"fast-skipping","n":"Skipping rápido","g":"Cardio","d":"Skipping rápido elevando rodillas en el sitio. Alto impacto: para fases avanzadas."},{"s":"bicycling-stationary","n":"Bicicleta estática","g":"Cardio","d":"Bici estática: ajusta el sillín a la altura de la cadera y pedalea a ritmo conversacional. Cardio sin impacto ideal para tus rodillas."},{"s":"recumbent-bike","n":"Bicicleta reclinada","g":"Cardio","d":"Bici reclinada con respaldo: la opción más cómoda para espalda y rodillas. Perfecta para días suaves."},{"s":"air-bike","n":"Bicicleta de aire (assault)","g":"Cardio","d":"Bici de aire con brazos y piernas: intensidad alta muy rápido. Úsala solo en intervalos cortos y más adelante."},{"s":"elliptical-trainer","n":"Elíptica","g":"Cardio","d":"Elíptica: movimiento completo sin impacto. Buena alternativa a la cinta si las rodillas piden descanso."},{"s":"rowing-stationary","n":"Remo (máquina de remar)","g":"Cardio","d":"Máquina de remo: empuja primero con las piernas, luego tira con la espalda. Cardio completo sin impacto; técnica antes que velocidad."},{"s":"walking-treadmill","n":"Caminar en cinta","g":"Cardio","d":"Caminar en cinta: tu herramienta para los 7.000 pasos. Ritmo en el que puedas hablar; cuando se quede corto, sube la inclinación antes que la velocidad."},{"s":"jogging-treadmill","n":"Trote en cinta","g":"Cardio","d":"Trote en cinta: alto impacto para tu peso actual. Todavía no; la caminata inclinada da el mismo beneficio sin castigar rodillas."},{"s":"stairmaster","n":"Escaladora (stairmaster)","g":"Cardio","d":"Escaladora de peldaños: cardio intenso y sin impacto, quema muchísimo. Empieza con pocos minutos a ritmo lento."}];
 const KEY="gymlog-ivan-v1";
 
 /* ================= FASES por entrenos completados ================= */
-function fase(n){ /* n = número del entreno que toca (completados + 1) */
+function fase(n){
  if(n<=4)return{nombre:"Adaptación · Entrenos 1-4",max:2,
   cuerda:"Todavía sin cuerda: dispara las pulsaciones. Sáltala.",
   cinta:"Suave, ritmo de hablar. Hacia tus 7.000 pasos",bici:"10-15 min muy suave",
@@ -186,62 +218,100 @@ function load(){
  return{sessions:[],overrides:{}};
 }
 function persist(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){alert("No se pudo guardar (almacenamiento lleno o modo privado)")}}
-
-/* Ejercicio efectivo de un hueco (aplica el cambio ⇄ si existe) */
 function efectivo(ex){
  const o=state.overrides[ex.id];
  if(!o)return ex;
  return{...ex,nombre:o.n,img:o.s,swapped:true};
 }
 
-/* ================= FECHAS / UTIL ================= */
+/* ================= UTIL ================= */
 function mondayOf(d){const x=new Date(d);const day=(x.getDay()+6)%7;x.setDate(x.getDate()-day);x.setHours(0,0,0,0);return x}
 const fmt=iso=>new Date(iso).toLocaleDateString("es-ES",{weekday:"short",day:"numeric",month:"short"});
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fmtSeries=(arr,cardio)=>arr.map(s=>cardio?(s.r||s.p):`${s.p||"?"}×${s.r||"?"}`).join(" · ");
-function togImg(el){const f=el.dataset.f==="0"?"1":"0";el.dataset.f=f;el.src="images/"+el.dataset.ex+"_"+f+".jpg"}
+const fmtDur=s=>{if(!s)return"";const m=Math.floor(s/60);return m>=60?`${Math.floor(m/60)}h ${m%60}m`:`${m} min`};
 
 /* ================= NAVEGACIÓN ================= */
-let vista="semana",diaActivo=null,datos={},extrasDia=[],abierta=null,exSel=null,picker=null;
+let vista="inicio",diaActivo=null,datos={},extrasDia=[],abierta=null,exSel=null,picker=null,detalle=null,calOff=0;
 const $=id=>document.getElementById(id);
 function toast(msg,ok=true){
  const t=document.createElement("div");t.className="toast"+(ok?"":" warn");t.textContent=msg;
  document.body.appendChild(t);setTimeout(()=>t.remove(),2200);
 }
-function nav(v){vista=v;stopTimer();render()}
+function nav(v){vista=v;picker=null;detalle=null;if(v!=="dia")cronStop();render()}
 
 function render(){
  const app=$("app");
- if(vista==="semana")app.innerHTML=viewSemana();
+ if(vista==="inicio")app.innerHTML=viewInicio();
+ else if(vista==="rutina")app.innerHTML=viewRutina();
  else if(vista==="dia")app.innerHTML=viewDia();
  else if(vista==="historial")app.innerHTML=viewHistorial();
  else if(vista==="progreso")app.innerHTML=viewProgreso();
  else if(vista==="ejercicios")app.innerHTML=viewEjercicios();
  else if(vista==="ajustes")app.innerHTML=viewAjustes();
+ if(picker)app.innerHTML+=viewPicker();
+ if(detalle)app.innerHTML+=viewDetalle();
  $("tabbar").style.display=vista==="dia"?"none":"flex";
- $("tabbar").innerHTML=["semana|Semana","historial|Historial","progreso|Progreso","ejercicios|Ejercicios","ajustes|Ajustes"]
+ $("tabbar").innerHTML=["inicio|Inicio","rutina|Rutina","historial|Historial","progreso|Progreso","ejercicios|Ejercicios"]
   .map(t=>{const[k,l]=t.split("|");return `<button class="tab ${vista===k?"on":""}" onclick="nav('${k}')">${l}</button>`}).join("");
- window.scrollTo(0,0);
+ $("app").scrollTop=0;
 }
 
-/* ---------- Semana ---------- */
-function sessionsThisWeek(){
- const m=mondayOf(new Date());
- return state.sessions.filter(s=>new Date(s.fecha)>=m);
+/* ---------- Inicio (calendario) ---------- */
+function diasGym(){
+ const s=new Set();
+ state.sessions.forEach(x=>{const d=new Date(x.fecha);s.add(d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate())});
+ return s;
 }
-function viewSemana(){
- const n=state.sessions.length+1; /* entreno que toca */
+function viewInicio(){
+ const hoy=new Date();
+ const base=new Date(hoy.getFullYear(),hoy.getMonth()+calOff,1);
+ const mesNombre=base.toLocaleDateString("es-ES",{month:"long",year:"numeric"});
+ const gym=diasGym();
+ const primerDow=(base.getDay()+6)%7;
+ const diasMes=new Date(base.getFullYear(),base.getMonth()+1,0).getDate();
+ let celdas="";
+ for(let i=0;i<primerDow;i++)celdas+=`<div class="cald off"></div>`;
+ for(let d=1;d<=diasMes;d++){
+  const esHoy=calOff===0&&d===hoy.getDate();
+  const esGym=gym.has(base.getFullYear()+"-"+base.getMonth()+"-"+d);
+  celdas+=`<div class="cald ${esGym?"gym":""} ${esHoy?"hoy":""}">${d}</div>`;
+ }
+ const semana=state.sessions.filter(s=>new Date(s.fecha)>=mondayOf(new Date()));
+ const n=state.sessions.length+1;
  const f=fase(n);
- const sems=sessionsThisWeek();
- const hechos=new Set(sems.map(s=>s.diaId));
- let h=`<h1>Mis <em>entrenos</em></h1>
- <p class="sub">Próximo: entreno nº ${n} · ${esc(f.nombre)}</p>
- <div class="card rowflex">
-   <div><div class="counter">${hechos.size}<small>/4</small></div>
-   <div class="sub" style="margin:0">esta semana</div></div>
-   <div style="font-size:20px;letter-spacing:4px">${[0,1,2,3].map(i=>`<span style="color:${i<hechos.size?"var(--acc)":"var(--line)"}">●</span>`).join("")}</div>
+ return `<div class="rowflex" style="margin-bottom:14px">
+  <div><h1>Mis <em>entrenos</em></h1><p class="sub" style="margin-bottom:0">Próximo: entreno nº ${n}</p></div>
+  <button class="gear" onclick="nav('ajustes')">⚙</button>
  </div>
+ <div class="cal">
+  <div class="calhead">
+   <button class="calnav" onclick="calOff--;render()">‹</button>
+   <b>${esc(mesNombre)}</b>
+   <button class="calnav" onclick="calOff++;render()">›</button>
+  </div>
+  <div class="calgrid">
+   ${["L","M","X","J","V","S","D"].map(d=>`<div class="caldow">${d}</div>`).join("")}
+   ${celdas}
+  </div>
+ </div>
+ <div class="stats2">
+  <div class="card"><b>${new Set(semana.map(s=>s.diaId)).size}/4</b><span>esta semana</span></div>
+  <div class="card"><b>${state.sessions.length}</b><span>entrenos totales</span></div>
+ </div>
+ <button class="bigbtn" onclick="nav('rutina')">Ir a la rutina de hoy →</button>
  <div class="note"><b>${esc(f.nombre)}.</b> ${esc(f.nota)}</div>`;
+}
+
+/* ---------- Rutina ---------- */
+function viewRutina(){
+ const n=state.sessions.length+1;
+ const f=fase(n);
+ const semana=state.sessions.filter(s=>new Date(s.fecha)>=mondayOf(new Date()));
+ const hechos=new Set(semana.map(s=>s.diaId));
+ let h=`<h1>Rutina</h1>
+ <p class="sub">Entreno nº ${n} · ${esc(f.nombre)} · esta semana ${hechos.size}/4</p>
+ <div class="note"><b>Pauta actual.</b> ${esc(f.nota)}</div>`;
  h+=RUTINA.map(d=>{
   const done=hechos.has(d.id);
   return `<div class="card tap rowflex" onclick="abrirDia('${d.id}')">
@@ -249,7 +319,6 @@ function viewSemana(){
    <span class="badge ${done?"done":"todo"}">${done?"✓ Hecho":"Pendiente"}</span>
   </div>`;
  }).join("");
- /* resumen semanas anteriores */
  const weeks={};
  const mAct=mondayOf(new Date()).getTime();
  state.sessions.forEach(s=>{
@@ -264,12 +333,34 @@ function viewSemana(){
  return h;
 }
 
+/* ---------- Cronómetro de sesión ---------- */
+let cronIni=null,cronAcc=0,cronOn=false;
+function cronStart(){cronIni=Date.now();cronAcc=0;cronOn=true}
+function cronElapsed(){return cronAcc+(cronOn&&cronIni?Date.now()-cronIni:0)}
+function cronToggle(){
+ if(cronOn){cronAcc+=Date.now()-cronIni;cronOn=false}
+ else{cronIni=Date.now();cronOn=true}
+ pintaCrono();
+ const b=$("cronbtn");if(b)b.textContent=cronOn?"⏸":"▶";
+ const t=$("crondisp");if(t)t.classList.toggle("pausa",!cronOn);
+}
+function cronReset(){if(!confirm("¿Reiniciar el cronómetro de entrenamiento?"))return;cronIni=Date.now();cronAcc=0;cronOn=true;pintaCrono();const b=$("cronbtn");if(b)b.textContent="⏸";const t=$("crondisp");if(t)t.classList.remove("pausa")}
+function cronStop(){cronOn=false;cronIni=null;cronAcc=0}
+function pintaCrono(){
+ const t=$("crondisp");if(!t)return;
+ const s=Math.floor(cronElapsed()/1000);
+ const hh=Math.floor(s/3600),mm=Math.floor((s%3600)/60),ss=s%60;
+ t.textContent=(hh?String(hh).padStart(2,"0")+":":"")+String(mm).padStart(2,"0")+":"+String(ss).padStart(2,"0");
+}
+setInterval(pintaCrono,500);
+
 /* ---------- Día ---------- */
 function abrirDia(id){
  diaActivo=RUTINA.find(d=>d.id===id);
  const f=fase(state.sessions.length+1);
  datos={};extrasDia=[];
  diaActivo.ejercicios.forEach(ex=>{datos[ex.id]=Array.from({length:targetSeries(ex,f)},()=>({p:"",r:""}))});
+ cronStart();
  vista="dia";render();
 }
 function prevDe(exId,nombre){
@@ -287,23 +378,15 @@ function prevExtra(nombre){
  }
  return null;
 }
-function serieRow(s,i,cardio,ph,pp,pr,onIn){
- if(cardio)return `<div class="srow"><span class="n">S${i+1}</span>
-  <input class="f ${s.r?"done":""}" placeholder="${esc(ph)}" value="${esc(s.r)}" oninput="${onIn}('r',this)">
-  <button class="x" onclick="${onIn.replace("setC","rmS").replace("setX","rmX")}()">✕</button></div>`;
- return "";
-}
 function viewDia(){
  const f=fase(state.sessions.length+1);
- let h=`<button class="back" onclick="nav('semana')">← Volver sin guardar</button>
+ let h=`<button class="back" onclick="nav('rutina')">← Volver sin guardar</button>
+ <div class="swipehint">Desliza desde el borde izquierdo para volver</div>
  <h1>${diaActivo.nombre}</h1><p class="sub">${diaActivo.sub} · Entreno nº ${state.sessions.length+1}</p>
- <div class="timer">
-  <span class="disp" id="tdisp">--:--</span>
-  <button class="tbtn" onclick="startTimer(60)">60s</button>
-  <button class="tbtn" onclick="startTimer(90)">90s</button>
-  <button class="tbtn" onclick="startTimer(120)">2min</button>
-  <button class="tbtn" onclick="startTimer(30)">30s</button>
-  <button class="tbtn stop" onclick="stopTimer(true)">Stop</button>
+ <div class="crono">
+  <span class="t" id="crondisp">00:00</span>
+  <button class="cbtn" id="cronbtn" onclick="cronToggle()">⏸</button>
+  <button class="cbtn warn" onclick="cronReset()">↺</button>
  </div>`;
  h+=diaActivo.ejercicios.map(exBase=>{
   const ex=efectivo(exBase);
@@ -323,14 +406,13 @@ function viewDia(){
     <button class="x" onclick="rmSerie('${ex.id}',${i})">✕</button></div>`;
   }).join("");
   return `<div class="ex"><div class="extop">
-   <img class="exim" src="images/${ex.img}_0.jpg" data-f="0" data-ex="${ex.img}" onclick="togImg(this)" onerror="this.style.display='none'">
+   <img class="exim" src="images/${ex.img}_0.jpg" data-f="0" data-ex="${ex.img}" onerror="this.style.display='none'">
    <div class="excontent"><div class="exhead"><h4>${esc(ex.nombre)}</h4><span class="target">${esc(targetTxt(exBase,f))}</span></div>
    ${prev?`<div class="prev">Última vez: <b>${esc(fmtSeries(prev,ex.cardio))}</b></div>`:""}
    ${ex.swapped?`<div class="prev" style="color:var(--acc)">⇄ ejercicio sustituido</div>`:""}</div>
    <button class="swap" title="Cambiar ejercicio" onclick="abrirPicker('swap','${ex.id}')">⇄</button></div>
   ${rows}<button class="addset" onclick="addSerie('${ex.id}')">+ Añadir serie</button></div>`;
  }).join("");
- /* extras del día */
  h+=extrasDia.map((e,idx)=>{
   const prev=prevExtra(e.n);
   const rows=e.series.map((s,i)=>`<div class="srow"><span class="n">S${i+1}</span>
@@ -338,7 +420,7 @@ function viewDia(){
    <input class="f ${s.r?"done":""}" type="number" inputmode="numeric" placeholder="${prev&&prev[i]&&prev[i].r?esc(prev[i].r)+" reps":"reps / min"}" value="${esc(s.r)}" oninput="setExtra(${idx},${i},'r',this.value);this.classList.toggle('done',!!this.value)">
    <button class="x" onclick="rmSerieExtra(${idx},${i})">✕</button></div>`).join("");
   return `<div class="ex"><div class="extop">
-   ${e.s?`<img class="exim" src="images/${e.s}_0.jpg" data-f="0" data-ex="${e.s}" onclick="togImg(this)" onerror="this.style.display='none'">`:""}
+   ${e.s?`<img class="exim" src="images/${e.s}_0.jpg" data-f="0" data-ex="${e.s}" onerror="this.style.display='none'">`:""}
    <div class="excontent"><div class="exhead"><h4>${esc(e.n)}</h4><span class="target">extra de hoy</span></div>
    ${prev?`<div class="prev">Última vez: <b>${esc(fmtSeries(prev,false))}</b></div>`:""}</div>
    <button class="swap" onclick="quitarExtra(${idx})">✕</button></div>
@@ -346,7 +428,6 @@ function viewDia(){
  }).join("");
  h+=`<button class="addex" onclick="abrirPicker('add')">＋ Añadir ejercicio a este entreno</button>
  <div style="height:70px"></div><button class="savebtn" onclick="guardarSesion()">Guardar entreno</button>`;
- if(picker)h+=viewPicker();
  return h;
 }
 function setCampo(exId,i,c,v){datos[exId][i][c]=v}
@@ -357,21 +438,22 @@ function addSerieExtra(idx){extrasDia[idx].series.push({p:"",r:""});render()}
 function rmSerieExtra(idx,i){extrasDia[idx].series.splice(i,1);render()}
 function quitarExtra(idx){extrasDia.splice(idx,1);render()}
 
-/* ---------- Picker (cambiar / añadir ejercicio) ---------- */
-function abrirPicker(modo,exId){picker={modo,exId,q:""};render()}
+/* ---------- Picker ---------- */
+function abrirPicker(modo,exId){picker={modo,exId};render()}
 function cerrarPicker(){picker=null;render()}
 function viewPicker(){
  const titulo=picker.modo==="swap"?"Sustituir ejercicio":"Añadir ejercicio";
  const conOverride=picker.modo==="swap"&&state.overrides[picker.exId];
- let h=`<div class="picker">
+ let h=`<div class="overlay" id="pickov">
  <button class="back" onclick="cerrarPicker()">← Cancelar</button>
+ <div class="swipehint">Desliza desde el borde izquierdo para cancelar</div>
  <h1>${titulo}</h1>
  <p class="sub">${picker.modo==="swap"?"El cambio se guarda para los próximos entrenos (puedes restaurarlo)":"Solo para el entreno de hoy · quedará en el histórico"}</p>
  ${conOverride?`<button class="smallbtn" style="margin-bottom:12px" onclick="restaurarEx('${picker.exId}')">↩ Restaurar ejercicio original</button>`:""}
  ${picker.modo==="add"?`<div class="card" style="display:flex;gap:8px">
    <input class="f" id="customex" placeholder="O escribe uno personalizado...">
-   <button class="tbtn" onclick="addCustom()">Añadir</button></div>`:""}
- <input class="f" placeholder="Buscar ejercicio..." oninput="filtrarPick(this.value)" style="margin-bottom:12px">`;
+   <button class="cbtn" style="width:auto;padding:0 14px" onclick="addCustom()">Añadir</button></div>`:""}
+ <input class="f" placeholder="Buscar ejercicio..." oninput="filtrar(this.value,'pickitem','pickgrupo')" style="margin-bottom:12px">`;
  const grupos=[...new Set(CATALOGO.map(c=>c.g))];
  h+=grupos.map(g=>`<div class="pickgrupo"><label class="lbl">${g}</label>`+
   CATALOGO.filter(c=>c.g===g).map(c=>`<div class="card pickitem" data-n="${esc(c.n.toLowerCase())} ${esc(c.g.toLowerCase())}" onclick="elegir('${c.s}')">
@@ -380,11 +462,11 @@ function viewPicker(){
   </div>`).join("")+`</div>`).join("");
  return h+`</div>`;
 }
-function filtrarPick(v){
+function filtrar(v,itemCls,grpCls){
  v=v.toLowerCase().trim();
- document.querySelectorAll(".pickitem").forEach(el=>{el.style.display=el.dataset.n.includes(v)?"flex":"none"});
- document.querySelectorAll(".pickgrupo").forEach(g=>{
-  const any=[...g.querySelectorAll(".pickitem")].some(el=>el.style.display!=="none");
+ document.querySelectorAll("."+itemCls).forEach(el=>{el.style.display=el.dataset.n.includes(v)?"flex":"none"});
+ document.querySelectorAll("."+grpCls).forEach(g=>{
+  const any=[...g.querySelectorAll("."+itemCls)].some(el=>el.style.display!=="none");
   g.style.display=any?"block":"none";
  });
 }
@@ -409,6 +491,25 @@ function restaurarEx(exId){
  delete state.overrides[exId];persist();picker=null;toast("Ejercicio restaurado ↩");render();
 }
 
+/* ---------- Ficha de ejercicio ---------- */
+function abrirDetalle(slug){detalle=slug;render()}
+function cerrarDetalle(){detalle=null;render()}
+function viewDetalle(){
+ const c=CATALOGO.find(x=>x.s===detalle);
+ if(!c)return"";
+ return `<div class="overlay">
+ <button class="back" onclick="cerrarDetalle()">← Volver</button>
+ <div class="swipehint">Desliza desde el borde izquierdo para volver</div>
+ <h1>${esc(c.n)}</h1>
+ <p class="sub">${c.g}</p>
+ <div class="detimgs">
+  <figure><img src="images/${c.s}_0.jpg" onerror="this.parentElement.style.display='none'"><figcaption>Inicio</figcaption></figure>
+  <figure><img src="images/${c.s}_1.jpg" onerror="this.parentElement.style.display='none'"><figcaption>Final</figcaption></figure>
+ </div>
+ <div class="detdesc">${esc(c.d||"")}</div>
+ </div>`;
+}
+
 /* ---------- Guardar sesión ---------- */
 function guardarSesion(){
  const entradas={},nombres={};let algo=false;
@@ -420,27 +521,11 @@ function guardarSesion(){
  const extras=extrasDia.map(e=>({n:e.n,s:e.s,series:e.series.filter(s=>s.p!==""||s.r!=="")})).filter(e=>e.series.length);
  if(extras.length)algo=true;
  if(!algo){toast("Apunta al menos una serie",false);return}
+ const dur=Math.round(cronElapsed()/1000);
  state.sessions.unshift({fecha:new Date().toISOString(),diaId:diaActivo.id,diaNombre:diaActivo.nombre,
-  num:state.sessions.length+1,entradas,nombres,extras});
- persist();toast("Entreno guardado 💪");nav("semana");
+  num:state.sessions.length+1,entradas,nombres,extras,dur});
+ persist();toast("Entreno guardado 💪");nav("inicio");
 }
-
-/* ---------- Cronómetro ---------- */
-let tInt=null,tEnd=0;
-function startTimer(sec){
- stopTimer();tEnd=Date.now()+sec*1000;
- const d=$("tdisp");if(d)d.classList.add("run");
- tick();tInt=setInterval(tick,250);
-}
-function tick(){
- const d=$("tdisp");if(!d){stopTimer();return}
- const left=Math.max(0,Math.round((tEnd-Date.now())/1000));
- d.textContent=String(Math.floor(left/60)).padStart(2,"0")+":"+String(left%60).padStart(2,"0");
- if(left<=0){stopTimer();d.textContent="¡YA!";beep();if(navigator.vibrate)navigator.vibrate([200,100,200]);
-  setTimeout(()=>{if($("tdisp"))$("tdisp").textContent="--:--"},2000)}
-}
-function stopTimer(reset){if(tInt){clearInterval(tInt);tInt=null}const d=$("tdisp");if(d){d.classList.remove("run");if(reset)d.textContent="--:--"}}
-function beep(){try{const C=window.AudioContext||window.webkitAudioContext;const ctx=new C();const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=880;g.gain.value=.25;o.start();setTimeout(()=>{o.stop();ctx.close()},450)}catch(e){}}
 
 /* ---------- Historial ---------- */
 function viewHistorial(){
@@ -460,7 +545,7 @@ function viewHistorial(){
    <button class="smallbtn danger" style="margin-top:10px" onclick="event.stopPropagation();borrarSesion(${idx})">Borrar este entreno</button></div>`;
   }
   return `<div class="card hcard"><div class="top" onclick="abierta=${open?"null":idx};render()">
-   <h4>${s.diaNombre}</h4><span class="fecha">${s.num?"nº"+s.num+" · ":""}${fmt(s.fecha)}</span></div>${det}</div>`;
+   <h4>${s.diaNombre}</h4><span class="fecha">${s.num?"nº"+s.num+" · ":""}${fmt(s.fecha)}${s.dur?"<br>"+fmtDur(s.dur):""}</span></div>${det}</div>`;
  }).join("");
  return h;
 }
@@ -506,28 +591,21 @@ function viewProgreso(){
 /* ---------- Biblioteca ---------- */
 function viewEjercicios(){
  const grupos=[...new Set(CATALOGO.map(c=>c.g))];
- let h=`<h1>Ejercicios</h1><p class="sub">${CATALOGO.length} ejercicios · toca la foto para ver la posición final</p>
- <input class="f" placeholder="Buscar ejercicio..." oninput="filtrarLib(this.value)" style="margin-bottom:14px;width:100%">`;
+ let h=`<h1>Ejercicios</h1><p class="sub">${CATALOGO.length} ejercicios · toca uno para ver su ficha</p>
+ <input class="f" placeholder="Buscar ejercicio..." oninput="filtrar(this.value,'libitem','libgrupo')" style="margin-bottom:14px;width:100%">`;
  h+=grupos.map(g=>`<div class="libgrupo"><label class="lbl">${g}</label>`+
-  CATALOGO.filter(c=>c.g===g).map(c=>`<div class="card libitem" data-n="${esc(c.n.toLowerCase())} ${esc(c.g.toLowerCase())}">
-   <img class="exim" src="images/${c.s}_0.jpg" data-f="0" data-ex="${c.s}" onclick="togImg(this)" loading="lazy" onerror="this.style.display='none'">
+  CATALOGO.filter(c=>c.g===g).map(c=>`<div class="card libitem" data-n="${esc(c.n.toLowerCase())} ${esc(c.g.toLowerCase())}" onclick="abrirDetalle('${c.s}')">
+   <img class="exim" src="images/${c.s}_0.jpg" loading="lazy" onerror="this.style.display='none'">
    <div style="min-width:0"><div style="font-weight:600;font-size:15px">${esc(c.n)}</div><span class="groupchip">${g}</span></div>
   </div>`).join("")+`</div>`).join("");
  return h;
-}
-function filtrarLib(v){
- v=v.toLowerCase().trim();
- document.querySelectorAll(".libitem").forEach(el=>{el.style.display=el.dataset.n.includes(v)?"flex":"none"});
- document.querySelectorAll(".libgrupo").forEach(g=>{
-  const any=[...g.querySelectorAll(".libitem")].some(el=>el.style.display!=="none");
-  g.style.display=any?"block":"none";
- });
 }
 
 /* ---------- Ajustes ---------- */
 function viewAjustes(){
  const ov=Object.entries(state.overrides);
- return `<h1>Ajustes</h1><p class="sub">Datos y configuración</p>
+ return `<button class="back" onclick="nav('inicio')">← Inicio</button>
+ <h1>Ajustes</h1><p class="sub">Datos y configuración</p>
  <div class="card">
   <label class="lbl">Progresión</label>
   <p class="sub" style="margin:0">Entrenos completados: <b style="color:var(--ink)">${state.sessions.length}</b>. La fase (series, cuerda, cardio) sube sola con tus entrenos: 1-4 adaptación con 2 series · 5-8 con 3 series y cuerda suave · 9-12 series completas · 13+ rutina plena.</p>
@@ -570,6 +648,52 @@ function borrarTodo(){
  if(!confirm("¿Del todo seguro? No hay vuelta atrás (salvo backup)."))return;
  state={sessions:[],overrides:{}};persist();toast("Datos borrados");render();
 }
+
+/* ---------- Toque en imágenes (fiable en iOS) ---------- */
+(function(){
+ let moved=false,sx=0,sy=0;
+ document.addEventListener("touchstart",e=>{
+  const t=e.touches[0];sx=t.clientX;sy=t.clientY;moved=false;
+ },{passive:true});
+ document.addEventListener("touchmove",e=>{
+  const t=e.touches[0];
+  if(Math.abs(t.clientX-sx)>10||Math.abs(t.clientY-sy)>10)moved=true;
+ },{passive:true});
+ function toggle(el){
+  const f=el.dataset.f==="0"?"1":"0";
+  el.dataset.f=f;
+  el.src="images/"+el.dataset.ex+"_"+f+".jpg";
+ }
+ document.addEventListener("touchend",e=>{
+  const el=e.target.closest(".exim");
+  if(el&&el.dataset.ex&&!moved){e.preventDefault();toggle(el)}
+ },{passive:false});
+ document.addEventListener("click",e=>{
+  const el=e.target.closest(".exim");
+  if(el&&el.dataset.ex&&!("ontouchstart" in window))toggle(el);
+ });
+})();
+
+/* ---------- Gesto: deslizar desde el borde izquierdo para volver ---------- */
+(function(){
+ let x0=null,y0=null;
+ document.addEventListener("touchstart",e=>{
+  const t=e.touches[0];
+  x0=t.clientX<=28?t.clientX:null;y0=t.clientY;
+ },{passive:true});
+ document.addEventListener("touchend",e=>{
+  if(x0===null)return;
+  const t=e.changedTouches[0];
+  const dx=t.clientX-x0,dy=Math.abs(t.clientY-y0);
+  x0=null;
+  if(dx>70&&dy<60){
+   if(detalle){cerrarDetalle();return}
+   if(picker){cerrarPicker();return}
+   if(vista==="dia"){nav("rutina");return}
+   if(vista==="ajustes"){nav("inicio");return}
+  }
+ },{passive:true});
+})();
 
 render();
 if("serviceWorker" in navigator){
