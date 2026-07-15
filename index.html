@@ -79,7 +79,8 @@ h1 em{color:var(--acc);font-style:normal}
 .excontent{flex:1;min-width:0}
 .exhead{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 .exhead h4{margin:0;font-size:15px;font-weight:650;letter-spacing:-.1px}
-.target{color:var(--acc);font-size:12.5px;font-weight:650;white-space:nowrap;text-align:right}
+.target{color:var(--acc);font-size:12.5px;font-weight:650;white-space:nowrap;text-align:right;max-width:52%;overflow:hidden;text-overflow:ellipsis}
+.targetline{color:var(--acc);font-size:12.5px;font-weight:650;margin:5px 0 2px;line-height:1.35}
 .swap{background:none;border:none;color:var(--mut);font-size:15px;cursor:pointer;padding:2px 4px;flex:none}
 .prev{font-size:12px;color:var(--mut);margin:5px 0 4px}
 .prev b{color:var(--ink);font-weight:600}
@@ -394,7 +395,7 @@ function viewDia(){
   const prev=prevDe(ex.id,ex.nombre);
   const rows=datos[ex.id].map((s,i)=>{
    if(ex.cardio){
-    const ph=(prev&&prev[i]&&prev[i].r)||targetTxt(exBase,f)||(ex.hint||"detalle");
+    const ph=(prev&&prev[i]&&prev[i].r)||ex.hint||(ex.cinta?"ej. 6.500 pasos, 25 min":ex.bici?"ej. 15 min":ex.cuerda?"ej. 4×20/60":"apunta aquí");
     return `<div class="srow"><span class="n">S${i+1}</span>
      <input class="f ${s.r?"done":""}" placeholder="${esc(ph)}" value="${esc(s.r)}" oninput="setCampo('${ex.id}',${i},'r',this.value);this.classList.toggle('done',!!this.value)">
      <button class="x" onclick="rmSerie('${ex.id}',${i})">✕</button></div>`;
@@ -406,9 +407,12 @@ function viewDia(){
     <input class="f ${s.r?"done":""}" type="number" inputmode="numeric" placeholder="${esc(pr)}" value="${esc(s.r)}" oninput="setCampo('${ex.id}',${i},'r',this.value);this.classList.toggle('done',!!this.value)">
     <button class="x" onclick="rmSerie('${ex.id}',${i})">✕</button></div>`;
   }).join("");
+  const tt=targetTxt(exBase,f);
+  const corto=tt.length<=16;
   return `<div class="ex"><div class="extop">
    <img class="exim" src="images/${ex.img}_0.jpg" data-f="0" data-ex="${ex.img}" onerror="this.style.display='none'">
-   <div class="excontent"><div class="exhead"><h4>${esc(ex.nombre)}</h4><span class="target">${esc(targetTxt(exBase,f))}</span></div>
+   <div class="excontent"><div class="exhead"><h4>${esc(ex.nombre)}</h4>${corto?`<span class="target">${esc(tt)}</span>`:""}</div>
+   ${corto?"":`<div class="targetline">${esc(tt)}</div>`}
    ${prev?`<div class="prev">Última vez: <b>${esc(fmtSeries(prev,ex.cardio))}</b></div>`:""}
    ${ex.swapped?`<div class="prev" style="color:var(--acc)">⇄ ejercicio sustituido</div>`:""}</div>
    <button class="swap" title="Cambiar ejercicio" onclick="abrirPicker('swap','${ex.id}')">⇄</button></div>
